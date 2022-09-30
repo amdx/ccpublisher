@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AMDX ccpublisher</title>
+    <link href="/static/css/amdx.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/x-icon" href="/static/assets/favicon.ico">
+</head>
+
+<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+
+<body>
+    <main class="page">
+        <div class="container py-4">
+          <header class="pb-2 mb-4 border-bottom">
+            <nav class="navbar navbar-expand-lg">
+              <div class="container-md">
+                <a class="navbar-brand" href="https://www.amdx.de" class="d-flex align-items-center text-dark text-decoration-none">
+                  <img width="173" height="32" src="/static/assets/amdx-logo.svg" class="attachment-large size-large" alt="" loading="lazy">
+                </a>
+                <h3>Cameo collaborator publisher</h3>
+                <div>
+                  <ul class="nav nav-pills" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                      <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#publisher" type="button" role="tab" aria-controls="publisher" aria-selected="true">Publisher</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <button class="nav-link" id="logs-tab" data-bs-toggle="tab" data-bs-target="#queue" type="button" role="tab" aria-controls="queue" aria-selected="true">Queue</button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </nav>
+          </header>
+
+          <div class="tab-content alert alert-danger" id="connection-error" style="display: none">
+            ERROR: Unable to retrieve data from the service. States might be stale.
+          </div>
+
+          <div class="tab-content alert alert-info" id="refresh" style="display: none">
+            Refreshing table, please wait
+          </div>
+
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="publisher" role="tabpanel" aria-labelledby="publisher-tab">
+
+              <!-- main begin -->
+
+              <table id="profiles" class="table table-sm">
+                <tr class="align-bottom">
+                  <th>Project</th>
+                  <th>Magicdraw</th>
+                  <th>Cameo collaborator</th>
+                  <th>Template</th>
+                  <th></th>
+                </tr>
+              {% for profile in profiles %}
+                <tr>
+                  <td class="text-nowrap"><small><strong>{{ profile.md.category_path }}/{{ profile.md.name }}</strong></small></td>
+                  <td class="w-25">
+                    <div class="text-nowrap">{{ profile.md.modified }}</div>
+                    <div class="commit-info">
+                      <strong>Revision {{ profile.md.last_commit.id }} ({{ profile.md.last_commit.author}})</strong>
+                      <div>{{ profile.md.last_commit.message}}</div>
+                    </div>
+                  </td>
+                  <td>
+                    {% if profile.cc %}
+                    <div class="text-nowrap">{{ profile.cc.modified }}</div>
+                    <strong class="commit-info">Revision {{ profile.cc.last_commit.id }} ({{ profile.cc.last_commit.author}})</strong>
+                    {% else %}
+                    N/A
+                    {% endif %}
+                  </td>
+                  <td class="text-nowrap">{{ profile.stereo_data.template_name }}</td>
+                  <td class="col-2 text-nowrap">
+                    <button id="button-{{ profile.id }}" class="btn btn-outline-{% if profile.is_stale %}dark{% else %}secondary{% endif %} btn-sm text-nowrap publish" style="width: 70%" type="button" onclick="publish('{{ profile.id }}')">
+                      <span class="spinner-border spinner-border-sm spinner" role="status" aria-hidden="true" style="display: none"></span>
+                      <span class="sr-only button-text">Publish</span>
+                    </button>
+                    <button class="btn btn-outline-dark btn-sm" style="width: 30%" type="button" onclick="window.open('{{ extra_context.cc_base_url }}{{ profile.cc.id }}')" {% if not profile.cc %}disabled{% endif %}>Open</button>
+                  </td>
+                </tr>
+              {% endfor %}
+              </table>
+              <!-- main end  -->
+
+            </div>
+            <div class="tab-pane fade" id="queue" role="tabpanel" aria-labelledby="queue-tab">
+
+              <!-- queue begin-->
+
+              <div class="row">
+                <div class="list-group col-6 mb-3">
+                  <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                      <div class="ms-2 me-auto">
+                        <div class="fw-bold">Service state</div>
+                        <div>
+                          <span id="state">N/A</span>
+                          <span id="spinner" class="spinner-border spinner-border-sm mx-1" role="status"></span>
+                        </div>
+                      </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                      <div class="ms-2 me-auto">
+                        <div class="fw-bold">Currently processing</div>
+                        <div id="current_project">N/A</div>
+                      </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                      <div class="ms-2 me-auto">
+                        <div class="fw-bold">Previous task</div>
+                        <div id="last_task">N/A</div>
+                      </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                      <div class="ms-2 me-auto">
+                        <div class="fw-bold">Tasks in queue</div>
+                        <div id="qsize">N/A</div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <div class="col-6">
+                  <h5>Queue</h5>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Index</th>
+                        <th>Project</th>
+                      </tr>
+                    </thead>
+                    <tbody id="queue_tbody">
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <button id="terminate" class="btn btn-outline-dark" onclick="terminate_session()">Terminate current task</button>
+              <button id="killtasks" class="btn btn-outline-dark" onclick="kill_tasks()">Remove enqueued tasks</button>
+              <button id="rescan" class="btn btn-outline-dark" type="button" onclick="rescan_profiles()">
+                <span class="spinner-border spinner-border-sm spinner" role="status" aria-hidden="true" style="display: none"></span>
+                <span class="sr-only button-text">Rescan profiles</span>
+              </button>
+
+              <hr/>
+              <h3>Magicdraw log</h3>
+              <pre id="loglines">
+              </pre>
+              <!-- queue end -->
+
+            </div>
+          </div>
+
+          <div class="position-fixed top-0 start-0 p-3" style="z-index: 11">
+            <div id="liveToast" class="toast hide text-white bg-dark" role="alert" aria-live="polite" aria-atomic="true" data-bs-delay="2000">
+              <div id="toast-msg" class="toast-body"></div>
+            </div>
+          </div>
+
+          <footer class="pt-3 mt-4 text-muted border-top">
+            AMDX ccpublisher v{{ version }} - © 2022 Archimedes-Exhibitions GmbH
+          </footer>
+        </div>
+      </main>
+</body>
+
+<script type="text/javascript" src="/static/js/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="/static/js/ccpublisher.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(
+        function() {
+          get_status();
+          setInterval(get_status, 1000);
+        }
+    );
+</script>
+
+</html>

@@ -1,0 +1,22 @@
+api:
+  listen_address: 0.0.0.0
+  port: 9999
+
+publisher:
+  template: etc/template.properties
+  script: /opt/MagicDraw2021r2hf2/plugins/com.nomagic.collaborator.publisher/publish
+  queue_maxsize: 5
+
+fileobserver:
+  file_path: /home/magicdraw/.magicdraw/2021x/magicdraw.log
+  backlog: 15
+
+auth:
+  username: user
+  password: password
+
+twc:
+  api_url: https://twc.local:8111/osmc/
+
+extra_context:
+  cc_base_url: https://cc.local:8443/collaborator/document/

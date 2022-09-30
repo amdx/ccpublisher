@@ -1,0 +1,70 @@
+body, html {
+    background-color: #FF5703!important;
+    height: 100%;
+}
+
+.page {
+    background-color: #fff;
+    min-height: 100vh;
+}
+
+.bg-amdx {
+    --bs-bg-opacity: 1;
+    background-color: #FF5703!important;
+}
+
+.btn-amdx {
+    color: #fff!important;
+    background-color: #FF5703!important;
+    border-color: #FF5703!important;
+}
+
+.list-view {
+    list-style: none;
+    padding: 0;
+}
+
+.list-view b{
+    width: 150px;
+    display: inline-flex;
+}
+
+.list-view .session-li {
+    margin-top: 20px;
+    border-top: 1px solid #bbb;
+    padding-top: 20px;
+}
+
+.list-view li:last-child {
+    margin-bottom: 30px;
+}
+
+iframe {
+    width: 100%;
+    height: 90vh;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    color: #fff!important;
+    background-color: #FF5703!important;
+}
+
+.nav-pills .nav-link {
+    color: #000!important;
+}
+
+#loglines {
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+    font-size: 0.7em;
+    background-color: #eee;
+    padding: 4px;
+    height: 300px;
+}
+
+.commit-info {
+    font-size: 0.7em;
+}

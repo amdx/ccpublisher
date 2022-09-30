@@ -1,0 +1,22 @@
+api:
+  listen_address: 0.0.0.0
+  port: 9999
+
+publisher:
+  template: examples/template.properties
+  script: examples/publish_mock.sh
+  queue_maxsize: 5
+
+fileobserver:
+  file_path: /tmp/test.log
+  backlog: 10
+
+auth:
+  username: user
+  password: password
+
+twc:
+  api_url: https://twc.local:8111/osmc/
+
+extra_context:
+  cc_base_url: https://cc.local:8443/collaborator/document/
