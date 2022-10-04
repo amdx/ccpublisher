@@ -29,6 +29,13 @@ aionotify = "^0.2.0"
 aiofiles = "^0.8.0"
 atwc = "^1.0.0"
 
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+Sphinx = "5.2.3"
+sphinx-rtd-theme = "1.0.0"
+
 [tool.poetry.dev-dependencies]
 flake8 = "^5.0.4"
 
