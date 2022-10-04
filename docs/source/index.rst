@@ -11,6 +11,7 @@ Cameo Collaborator headless publisher
    :caption: Installation:
 
    installation/service
+   installation/project
 
 
 Indices and tables
