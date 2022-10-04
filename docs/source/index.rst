@@ -8,8 +8,9 @@ Cameo Collaborator headless publisher
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Installation:
 
+   installation/service
 
 
 Indices and tables
