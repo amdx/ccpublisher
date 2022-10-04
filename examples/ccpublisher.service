@@ -6,10 +6,10 @@ After=network.target
 [Service]
 RestartSec=2s
 Type=simple
-User=archimedes
-Group=archimedes
-WorkingDirectory=/opt/amdx/ccpublisher
-ExecStart=/opt/amdx/ccpublisher/bin/ccpublisher /opt/amdx/ccpublisher/etc/config.yaml
+User=ccpublisher
+Group=ccpublisher
+WorkingDirectory=/opt/ccpublisher
+ExecStart=/opt/ccpublisher/bin/ccpublisher /opt/ccpublisher/etc/config.yaml
 Restart=always
 
 [Install]
