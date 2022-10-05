@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ccpublisher service installation guide &mdash; ccpublisher 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Project setup" href="project.html" />
+    <link rel="prev" title="Cameo Collaborator headless publisher" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> ccpublisher
+          </a>
+              <div class="version">
+                1.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ccpublisher service installation guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#service-installation-outline">Service installation outline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-magicdraw">Install MagicDraw</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configure-magicdraw-for-headless-operation">Configure MagicDraw for headless operation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#floating-license">Floating license</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testing-a-headless-execution">Testing a headless execution</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#install-required-system-packages-and-ccpublisher">Install required system packages and ccpublisher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#service-configuration">Service configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#config-yaml">config.yaml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#template-properties">template.properties</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#test-the-service">Test the service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configure-systemd-to-start-the-service-at-boot">Configure systemd to start the service at boot</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="project.html">Project setup</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ccpublisher</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>ccpublisher service installation guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/installation/service.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ccpublisher-service-installation-guide">
+<h1>ccpublisher service installation guide<a class="headerlink" href="#ccpublisher-service-installation-guide" title="Permalink to this heading"></a></h1>
+<p>Requirements:</p>
+<ul class="simple">
+<li><p>Teamwork Cloud and Cameo Collaborator services</p></li>
+<li><p>A user/password set for Teamwork Cloud that has R/W access to the targeted resources (MD and CC)</p></li>
+<li><p>Ubuntu Desktop 22.04 LTS (either physical or virtual)</p></li>
+<li><p>(this) ccpublisher package</p></li>
+</ul>
+<p><em>Note: the Ubuntu setup must be able to reach Teamwork Cloud server’s network endpoint and must be reachable from modelers</em></p>
+<section id="service-installation-outline">
+<h2>Service installation outline<a class="headerlink" href="#service-installation-outline" title="Permalink to this heading"></a></h2>
+<p>The procedure describes how to install the service under Ubuntu Linux (22.04 LTS),
+even though in principle any GNU/Linux distros should be working.</p>
+<p>Even if the service can run headless, MagicDraw requires a desktop environment.</p>
+<p>The guide implies that the same unprivileged user is used to install MagicDraw, service. The same user should be
+configured to automatically login into the desktop.</p>
+<ul class="simple">
+<li><p>Install MagicDraw</p></li>
+<li><p>Configure MagicDraw to allow headless operations</p></li>
+<li><p>Install the required system packages and ccpublisher package into a virtualenv</p></li>
+<li><p>Configure the service</p></li>
+<li><p>Test the service</p></li>
+<li><p>Set up a systemd unit file to start up the service automatically</p></li>
+</ul>
+</section>
+<section id="install-magicdraw">
+<h2>Install MagicDraw<a class="headerlink" href="#install-magicdraw" title="Permalink to this heading"></a></h2>
+<p>Follow the official documentation here: <a class="reference external" href="https://docs.nomagic.com/display/NMDOC/Installing+modeling+tools">https://docs.nomagic.com/display/NMDOC/Installing+modeling+tools</a></p>
+<p>Suggested target location: <cite>/opt/magicdrawXXXX</cite> (where XXXX is the version, eg: 2022x)</p>
+</section>
+<section id="configure-magicdraw-for-headless-operation">
+<h2>Configure MagicDraw for headless operation<a class="headerlink" href="#configure-magicdraw-for-headless-operation" title="Permalink to this heading"></a></h2>
+<p>Headless (or <em>batch mode</em>) allows the service to start MagicDraw without UI and hence retain full control of its execution.</p>
+<section id="floating-license">
+<h3>Floating license<a class="headerlink" href="#floating-license" title="Permalink to this heading"></a></h3>
+<p>In case a floating license is used, care should be taken to configure an automated borrowing.
+This could be done by launching magicdraw and checking the <em>Automatically login each time MagicDraw is started</em>:</p>
+<img alt="../_images/license_01.png" src="../_images/license_01.png" />
+<p>Select the features required and confirm:</p>
+<img alt="../_images/license_02.png" src="../_images/license_02.png" />
+<p>MagicDraw can now be closed.</p>
+</section>
+<section id="testing-a-headless-execution">
+<h3>Testing a headless execution<a class="headerlink" href="#testing-a-headless-execution" title="Permalink to this heading"></a></h3>
+<p>A test to check whether MagicDraw can start without user intervention:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd /opt/magicdrawXXXX/plugins/com.nomagic.collaborator.publisher
+$ ./publish
+</pre></div>
+</div>
+<p>The execution takes several seconds and it should end indicating a path for the <em>Log File</em>.
+No window/UI should have opened.</p>
+<p>Note down the location of the log, it is required afterwards.</p>
+</section>
+</section>
+<section id="install-required-system-packages-and-ccpublisher">
+<h2>Install required system packages and ccpublisher<a class="headerlink" href="#install-required-system-packages-and-ccpublisher" title="Permalink to this heading"></a></h2>
+<p>Clone ccpublisher’s repository:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/amdx/ccpublisher.git
+$ cd ccpublisher
+</pre></div>
+</div>
+<p>Install python3 and python3-dev. Under Ubuntu 22.04 this will pull python 3.10.6:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo apt install python3-dev python3-venv
+</pre></div>
+</div>
+<p>And create a virtualenv:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo mkdir /opt/ccpublisher
+$ sudo chown &lt;user&gt; /opt/ccpublisher
+$ python3 -m venv /opt/ccpublisher
+</pre></div>
+</div>
+<p>Create a folder for the configuration files and copy the samples into it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkdir /opt/ccpublisher/etc
+$ cp examples/{config.yaml,template.properties} /opt/ccpublisher/etc
+</pre></div>
+</div>
+<p>And finally install the service:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ /opt/ccpublisher/bin/pip install .
+</pre></div>
+</div>
+</section>
+<section id="service-configuration">
+<h2>Service configuration<a class="headerlink" href="#service-configuration" title="Permalink to this heading"></a></h2>
+<p>Two configuration files direct the process (they can be found in <cite>/opt/ccpublisher/etc</cite>):</p>
+<ol class="arabic simple">
+<li><p><cite>config.yaml</cite>: base configuration for the service</p></li>
+<li><p><cite>template.properties</cite>: properties file template that the service interpolates and passes to <cite>com.nomagic.collaborator.publisher</cite></p></li>
+</ol>
+<section id="config-yaml">
+<h3>config.yaml<a class="headerlink" href="#config-yaml" title="Permalink to this heading"></a></h3>
+<p>An annotated version of the configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># HTTP listening endpoint (API and UI)</span>
+<span class="n">api</span><span class="p">:</span>
+  <span class="n">listen_address</span><span class="p">:</span> <span class="mf">0.0.0.0</span>
+  <span class="n">port</span><span class="p">:</span> <span class="mi">9999</span>
+
+<span class="n">publisher</span><span class="p">:</span>
+  <span class="c1"># Path of the properties template file. Paths are relative to /opt/ccpublisher (see below systemd&#39;s unit file)</span>
+  <span class="n">template</span><span class="p">:</span> <span class="n">etc</span><span class="o">/</span><span class="n">template</span><span class="o">.</span><span class="n">properties</span>
+  <span class="c1"># Location of the script &quot;publish&quot;, check the path of MagicDraw&#39;s base installation</span>
+  <span class="n">script</span><span class="p">:</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">magicdrawXXXX</span><span class="o">/</span><span class="n">plugins</span><span class="o">/</span><span class="n">com</span><span class="o">.</span><span class="n">nomagic</span><span class="o">.</span><span class="n">collaborator</span><span class="o">.</span><span class="n">publisher</span><span class="o">/</span><span class="n">publish</span>
+  <span class="c1"># Maximum number of jobs that can be enqueued</span>
+  <span class="n">queue_maxsize</span><span class="p">:</span> <span class="mi">5</span>
+
+<span class="n">fileobserver</span><span class="p">:</span>
+  <span class="c1"># Path to the log file produced by MagicDraw (as shown when testing the headless mode)</span>
+  <span class="n">file_path</span><span class="p">:</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">magicdraw</span><span class="o">/.</span><span class="n">magicdraw</span><span class="o">/</span><span class="mi">2021</span><span class="n">x</span><span class="o">/</span><span class="n">magicdraw</span><span class="o">.</span><span class="n">log</span>
+  <span class="c1"># How many lines of the log to show</span>
+  <span class="n">backlog</span><span class="p">:</span> <span class="mi">15</span>
+
+<span class="c1"># A TWC user and password set, must be able to read and write/create resources</span>
+<span class="n">auth</span><span class="p">:</span>
+  <span class="n">username</span><span class="p">:</span> <span class="n">user</span>
+  <span class="n">password</span><span class="p">:</span> <span class="n">password</span>
+
+<span class="c1"># REST interface to TWC</span>
+<span class="n">twc</span><span class="p">:</span>
+  <span class="n">api_url</span><span class="p">:</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">twc</span><span class="o">.</span><span class="n">local</span><span class="p">:</span><span class="mi">8111</span><span class="o">/</span><span class="n">osmc</span><span class="o">/</span>
+
+<span class="n">extra_context</span><span class="p">:</span>
+  <span class="c1"># URL of CC&#39;s web interface</span>
+  <span class="n">cc_base_url</span><span class="p">:</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">cc</span><span class="o">.</span><span class="n">local</span><span class="p">:</span><span class="mi">8443</span><span class="o">/</span><span class="n">collaborator</span><span class="o">/</span><span class="n">document</span><span class="o">/</span>
+</pre></div>
+</div>
+</section>
+<section id="template-properties">
+<h3>template.properties<a class="headerlink" href="#template-properties" title="Permalink to this heading"></a></h3>
+<p>This file is taken directly from the example (<cite>/opt/magicdrawXXXX/plugins/com.nomagic.collaborator.publisher/template.properties</cite>)
+and it is being interpolated by the service once launching a publishing session.</p>
+<p>The following variables can be used:</p>
+<ul class="simple">
+<li><p><cite>{{ auth.username }}</cite>: TWC’s user (taken from <cite>config.yaml</cite>)</p></li>
+<li><p><cite>{{ auth.password }}</cite>: as above, password</p></li>
+<li><p><cite>{{ profile.md.name }}</cite>: name of the MD resource being processed</p></li>
+<li><p><cite>{{ profile.md.category_path }}</cite>: category path of the MD resource being processed</p></li>
+<li><p><cite>{{ profile.stereo_data.scope }}</cite>: list of scopes configured in the <cite>scope</cite> tag of the <cite>&lt;&lt;ccPublisher&gt;&gt;</cite> stereotype</p></li>
+<li><p><cite>{{ profile.stereo_data.template_name }}</cite>: template name configured in the <cite>template</cite> tag of the <cite>&lt;&lt;ccPublisher&gt;&gt;</cite> stereotype</p></li>
+</ul>
+<p>Make sure that all the properties listed in the file are applicable to the target setup.</p>
+</section>
+</section>
+<section id="test-the-service">
+<h2>Test the service<a class="headerlink" href="#test-the-service" title="Permalink to this heading"></a></h2>
+<p>Run the service with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd /opt/ccpublisher/
+$ bin/ccpublisher etc/config.yaml
+</pre></div>
+</div>
+<p>And open the link: <a class="reference external" href="http://localhost:9999">http://localhost:9999</a></p>
+</section>
+<section id="configure-systemd-to-start-the-service-at-boot">
+<h2>Configure systemd to start the service at boot<a class="headerlink" href="#configure-systemd-to-start-the-service-at-boot" title="Permalink to this heading"></a></h2>
+<p>Install the provided service file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo cp examples/ccpublisher.service /etc/systemd/system/
+$ sudo systemctl enable ccpublisher
+$ sudo systemctl start ccpublisher
+</pre></div>
+</div>
+<p>Modify <cite>user</cite> and <cite>group</cite> to match the target user.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Cameo Collaborator headless publisher" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="project.html" class="btn btn-neutral float-right" title="Project setup" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Archimedes Exhibitions GmbH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
