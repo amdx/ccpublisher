@@ -1,0 +1,40 @@
+# Taken from https://tomasfarias.dev/posts/sphinx-docs-with-poetry-and-github-pages/
+
+name: Documentation
+on:
+  push:
+    branches: [ master ]
+    tags: '*'
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+      with:
+        fetch-depth: 0
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install Poetry
+      uses: abatilo/actions-poetry@v2.1.4
+      with:
+        poetry-version: 1.2.1
+    - name: Install ccpublisher with Poetry
+      run: poetry install --with docs
+    - name: Build documentation
+      run: |
+        mkdir gh-pages
+        touch gh-pages/.nojekyll
+        cd docs/
+        poetry run sphinx-build -b html . _build
+        cp -r _build/* ../gh-pages/
+    - name: Deploy documentation
+      if: ${{ github.ref_type == 'tag' }}
+      uses: JamesIves/github-pages-deploy-action@4.4.0
+      with:
+        branch: gh-pages
+        folder: gh-pages
+
