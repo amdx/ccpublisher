@@ -54,11 +54,6 @@ Commit and head back to the service
 
 Once done, commit to push the changes to the server.
 
-The ccpublisher service must be restarted every time a new project is added to the list. Future versions might allow
-an online rescan.
+The list of available projects requires a rescan to incorporate the newly added resource.
+Press the button `Rescan profiles` from the `Queue` tab.
 
-Restart the service with::
-
-    $ sudo systemctl restart ccpublisher
-
-And then head to the service's UI: http://localhost:9999

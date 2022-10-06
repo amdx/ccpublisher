@@ -20,6 +20,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ccpublisher User Interface" href="../usage/ui.html" />
     <link rel="prev" title="ccpublisher service installation guide" href="service.html" /> 
 </head>
 
@@ -41,7 +42,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="service.html">ccpublisher service installation guide</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Project setup</a><ul>
@@ -50,6 +51,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#commit-and-head-back-to-the-service">Commit and head back to the service</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../usage/ui.html">ccpublisher User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/swagger.html">Swagger interface</a></li>
 </ul>
 
         </div>
@@ -122,13 +128,8 @@ folder.</p>
 <section id="commit-and-head-back-to-the-service">
 <h2>Commit and head back to the service<a class="headerlink" href="#commit-and-head-back-to-the-service" title="Permalink to this heading"></a></h2>
 <p>Once done, commit to push the changes to the server.</p>
-<p>The ccpublisher service must be restarted every time a new project is added to the list. Future versions might allow
-an online rescan.</p>
-<p>Restart the service with:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo systemctl restart ccpublisher
-</pre></div>
-</div>
-<p>And then head to the service’s UI: <a class="reference external" href="http://localhost:9999">http://localhost:9999</a></p>
+<p>The list of available projects requires a rescan to incorporate the newly added resource.
+Press the button <cite>Rescan profiles</cite> from the <cite>Queue</cite> tab.</p>
 </section>
 </section>
 
@@ -137,6 +138,7 @@ an online rescan.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="service.html" class="btn btn-neutral float-left" title="ccpublisher service installation guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../usage/ui.html" class="btn btn-neutral float-right" title="ccpublisher User Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

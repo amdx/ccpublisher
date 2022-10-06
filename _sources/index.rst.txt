@@ -8,10 +8,17 @@ Cameo Collaborator headless publisher
 
 .. toctree::
    :maxdepth: 2
-   :caption: Installation:
+   :caption: Installation
 
    installation/service
    installation/project
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Usage
+
+   usage/ui
+   usage/swagger
 
 
 Indices and tables
