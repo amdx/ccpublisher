@@ -51,9 +51,7 @@ class PublisherTask:
     def __json_repr__(self):
         return {
             **asdict(self),
-            **{a: getattr(self, a)
-               for a in dir(self)
-               if a[0] != '_'}
+            **{a: getattr(self, a) for a in dir(self) if a[0] != "_"},
         }
 
 
@@ -74,23 +72,22 @@ class Publisher:
         self._last_task = None
         self._proc_started_ts = 0
         self._state = self.State.INIT
-        logger.info(f'Loaded template file {template}')
+        logger.info(f"Loaded template file {template}")
 
     def start(self):
-        return asyncio.create_task(self._publisher_task(),
-                                   name='Publisher task')
+        return asyncio.create_task(self._publisher_task(), name="Publisher task")
 
     def get_current_status(self):
         return {
-            'state': self._state.name,
-            'last_task': self._last_task,
-            'current_task': self._current_task,
-            'queue': self.get_enqueued_tasks()
+            "state": self._state.name,
+            "last_task": self._last_task,
+            "current_task": self._current_task,
+            "queue": self.get_enqueued_tasks(),
         }
 
     def get_enqueued_tasks(self):
         return [
-            {'task_id': taskdata[0], 'task': taskdata[1]}
+            {"task_id": taskdata[0], "task": taskdata[1]}
             for taskdata in self._queue.entries
         ]
 
@@ -111,7 +108,7 @@ class Publisher:
 
     def terminate_running_task(self):
         if self._current_task:
-            logger.info('Terminating current task')
+            logger.info("Terminating current task")
             os.killpg(os.getpgid(self._process.pid), signal.SIGTERM)
             return True
         else:
@@ -126,7 +123,7 @@ class Publisher:
             try:
                 await self._publish(task)
             except Exception as e:
-                logger.error('Error while attempting to publish:')
+                logger.error("Error while attempting to publish:")
                 logger.exception(e)
             finally:
                 self._state = self.State.IDLE
@@ -141,21 +138,21 @@ class Publisher:
         self._state = self.State.RUNNING
 
         context = {
-            'profile': asdict(task.profile),
-            'auth': self._auth,
+            "profile": asdict(task.profile),
+            "auth": self._auth,
         }
-        logger.debug(f'Context: {context}')
+        logger.debug(f"Context: {context}")
         properties = self._template.render(context)
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            properties_file = Path(tmpdir) / 'project.properties'
-            f = open(properties_file, 'w')
+            properties_file = Path(tmpdir) / "project.properties"
+            f = open(properties_file, "w")
             f.write(properties)
             f.close()
 
-            invocation = f'./{self._script.name} properties={properties_file}'
-            logger.info('Running session')
-            logger.info(f' {invocation}')
+            invocation = f"./{self._script.name} properties={properties_file}"
+            logger.info("Running session")
+            logger.info(f" {invocation}")
 
             self._current_task.start_time = time.time()
 
@@ -165,15 +162,16 @@ class Publisher:
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
                 cwd=self._script.parent,
-                env={'DISPLAY': ':0'},
-                preexec_fn=os.setsid
+                env={"DISPLAY": ":0"},
+                preexec_fn=os.setsid,
             )
 
             # TODO: add stream reader tasks
             stdout, stderr = await self._process.communicate()
 
-            logger.info(f'rc={self._process.returncode} '
-                        f'stdout={stdout} stderr={stderr}')
+            logger.info(
+                f"rc={self._process.returncode} " f"stdout={stdout} stderr={stderr}"
+            )
 
             self._current_task.returncode = self._process.returncode
             self._current_task.stderr = stderr.decode()
@@ -184,4 +182,4 @@ class Publisher:
             self._current_task = None
             self._process = None
 
-            logger.info('Session completed')
+            logger.info("Session completed")

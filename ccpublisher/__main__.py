@@ -23,30 +23,27 @@ from ccpublisher import service
 
 logger = logging.getLogger(__name__)
 
-LOG_FORMAT = '[{asctime}] {levelname:.4} {{{name}:{lineno}}} {message}'
+LOG_FORMAT = "[{asctime}] {levelname:.4} {{{name}:{lineno}}} {message}"
 
 
 @click.command()
-@click.argument('config-file')
-@click.option('-d', '--debug/--no-debug', default=False,
-              help='Print debug messages')
+@click.argument("config-file")
+@click.option("-d", "--debug/--no-debug", default=False, help="Print debug messages")
 def main(config_file, debug):
     logging.basicConfig(
-        format=LOG_FORMAT,
-        style='{',
-        level=logging.DEBUG if debug else logging.INFO
+        format=LOG_FORMAT, style="{", level=logging.DEBUG if debug else logging.INFO
     )
 
     if not debug:
-        logging.getLogger('aiohttp.access').setLevel(logging.WARNING)
+        logging.getLogger("aiohttp.access").setLevel(logging.WARNING)
 
     service_ = service.Service(config_file)
 
     try:
         asyncio.run(service_.run(), debug=debug)
     except (KeyboardInterrupt, asyncio.exceptions.CancelledError):
-        logger.info('Exiting')
+        logger.info("Exiting")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

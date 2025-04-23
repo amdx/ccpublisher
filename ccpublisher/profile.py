@@ -68,13 +68,11 @@ class LockedError(Exception):
 
 
 class ProfilesManager:
-    CCPUB_STEREOTYPE_NAME = 'ccPublisher'
+    CCPUB_STEREOTYPE_NAME = "ccPublisher"
 
     def __init__(self, api_url, login, password):
         self._client = atwc.client.Client(
-            api_url=api_url,
-            login=login,
-            password=password
+            api_url=api_url, login=login, password=password
         )
         self._profiles = []
         self._lock = asyncio.Lock()
@@ -92,10 +90,10 @@ class ProfilesManager:
 
     async def fetch_all_profiles(self):
         if self._lock.locked():
-            raise LockedError('A refresh is already taking place')
+            raise LockedError("A refresh is already taking place")
 
         async with self._lock:
-            logger.info('Fetching all profiles')
+            logger.info("Fetching all profiles")
             profiles = []
             async with self._client.create_session():
                 resource_browser = atwc.browsers.ResourceBrowser(self._client)
@@ -116,11 +114,10 @@ class ProfilesManager:
                     profiles.append(profile)
 
             self._profiles = sorted(
-                profiles,
-                key=lambda p: (p.md.category_path + p.md.name).lower()
+                profiles, key=lambda p: (p.md.category_path + p.md.name).lower()
             )
 
-            logger.info(f'Assembled {len(self._profiles)} profiles')
+            logger.info(f"Assembled {len(self._profiles)} profiles")
 
     async def refresh_known_profiles(self):
         profiles = []
@@ -162,21 +159,20 @@ class ProfilesManager:
     def _generate_id(self, name):
         return hashlib.md5(name.encode()).hexdigest()
 
-    async def _populate_profile(self, md_resource, profile, resource_browser,
-                                stereo_data):
-        profile.md = await self._get_resource_data(
-            resource_browser, md_resource
-        )
+    async def _populate_profile(
+        self, md_resource, profile, resource_browser, stereo_data
+    ):
+        profile.md = await self._get_resource_data(resource_browser, md_resource)
         cc_resource = self._find_resource(
             resource_browser.cc_resources, profile.md.name
         )
         if cc_resource is None:
-            logger.warning(f"MD Resource {md_resource['dcterms:title']} "
-                "doesn't have an associated CC resource")
+            logger.warning(
+                f"MD Resource {md_resource['dcterms:title']} "
+                "doesn't have an associated CC resource"
+            )
 
-        profile.cc = await self._get_resource_data(
-            resource_browser, cc_resource
-        )
+        profile.cc = await self._get_resource_data(resource_browser, cc_resource)
 
         if stereo_data is not None:
             profile.stereo_data = stereo_data
@@ -188,32 +184,31 @@ class ProfilesManager:
         if resource is None:
             return None
 
-        created = datetime.datetime.fromtimestamp(resource['createdDate'])
-        modified = datetime.datetime.fromtimestamp(resource['modifiedDate'])
+        created = datetime.datetime.fromtimestamp(resource["createdDate"])
+        modified = datetime.datetime.fromtimestamp(resource["modifiedDate"])
         category_path = await resource_browser.get_category_path(resource)
 
         model_browser = atwc.browsers.ModelBrowser(self._client, resource)
         revision_info = await model_browser.get_revision_info()
         commit_info = CommitInfo(
-            id=revision_info['ID'],
-            author=revision_info['author'],
-            date=datetime.datetime.fromtimestamp(revision_info['createdDate']),
-            message=revision_info['description'],
+            id=revision_info["ID"],
+            author=revision_info["author"],
+            date=datetime.datetime.fromtimestamp(revision_info["createdDate"]),
+            message=revision_info["description"],
         )
 
         return Resource(
-            id=resource['ID'],
-            name=self._strip_extension(resource['dcterms:title']),
+            id=resource["ID"],
+            name=self._strip_extension(resource["dcterms:title"]),
             created=created,
             modified=modified,
             category_path=category_path,
-            last_commit=commit_info
+            last_commit=commit_info,
         )
 
     def _find_resource(self, resources, resource_name):
         for resource in resources:
-            if self._strip_extension(
-                    resource['dcterms:title']) == resource_name:
+            if self._strip_extension(resource["dcterms:title"]) == resource_name:
                 return resource
 
         return None
@@ -223,35 +218,35 @@ class ProfilesManager:
 
         model = await model_browser.get_model_root()
 
-        if not await model_browser.find_stereotype(
-                model, self.CCPUB_STEREOTYPE_NAME
-        ):
+        if not await model_browser.find_stereotype(model, self.CCPUB_STEREOTYPE_NAME):
             return None
 
         tagged_values = await model_browser.get_tagged_values(
             model, self.CCPUB_STEREOTYPE_NAME
         )
 
-        if 'serviceEnabled' in tagged_values \
-                and tagged_values['serviceEnabled'][0].lower() == 'false':
+        if (
+            "serviceEnabled" in tagged_values
+            and tagged_values["serviceEnabled"][0].lower() == "false"
+        ):
             return None
 
-        if 'scope' not in tagged_values or not tagged_values['scope']:
+        if "scope" not in tagged_values or not tagged_values["scope"]:
             logger.warning(f"Malformed scope, skipping resource")
             return None
 
-        scope_ids = atwc.utils.extract_ids(tagged_values['scope'])
+        scope_ids = atwc.utils.extract_ids(tagged_values["scope"])
         scope_elements = await model_browser.get_elements_batch(scope_ids)
 
         scope_qns = [
-            await model_browser.get_qualified_name(scope['data'][1])
+            await model_browser.get_qualified_name(scope["data"][1])
             for scope in scope_elements.values()
         ]
-        scope_str = ';'.join(scope_qns)
+        scope_str = ";".join(scope_qns)
 
-        template_id = atwc.utils.extract_ids(tagged_values['template'])[0]
+        template_id = atwc.utils.extract_ids(tagged_values["template"])[0]
         template_element = await model_browser.get_element(template_id)
-        template_name = template_element['kerml:esiData']['name']
+        template_name = template_element["kerml:esiData"]["name"]
 
         return StereoData(
             scope=scope_str,
@@ -259,9 +254,9 @@ class ProfilesManager:
         )
 
     def _strip_extension(self, resource_name):
-        if resource_name[-7:] == '.MASTER':
+        if resource_name[-7:] == ".MASTER":
             return resource_name[:-7]
-        elif resource_name[-3:] == '.CC':
+        elif resource_name[-3:] == ".CC":
             return resource_name[:-3]
         else:
             return resource_name

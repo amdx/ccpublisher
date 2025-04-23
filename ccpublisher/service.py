@@ -28,35 +28,35 @@ logger = logging.getLogger(__name__)
 
 class Service:
     def __init__(self, config_file):
-        logger.info(f'AMDX ccpublisher v{__version__.__version__} starting up')
+        logger.info(f"AMDX ccpublisher v{__version__.__version__} starting up")
 
         self._config = yaml.safe_load(open(config_file))
 
     async def run(self):
         loop = asyncio.get_running_loop()
-        for signame in {'SIGINT', 'SIGTERM'}:
+        for signame in {"SIGINT", "SIGTERM"}:
             loop.add_signal_handler(
-                getattr(signal, signame),
-                functools.partial(self._shutdown, signame))
+                getattr(signal, signame), functools.partial(self._shutdown, signame)
+            )
 
         profiles_manager = profile.ProfilesManager(
-            api_url=self._config['twc']['api_url'],
-            login=self._config['auth']['username'],
-            password=self._config['auth']['password']
+            api_url=self._config["twc"]["api_url"],
+            login=self._config["auth"]["username"],
+            password=self._config["auth"]["password"],
         )
         await profiles_manager.fetch_all_profiles()
 
         publisher_ = publisher.Publisher(
-            template=self._config['publisher']['template'],
-            auth=self._config['auth'],
-            script=self._config['publisher']['script'],
-            max_tasks=self._config['publisher']['queue_maxsize']
+            template=self._config["publisher"]["template"],
+            auth=self._config["auth"],
+            script=self._config["publisher"]["script"],
+            max_tasks=self._config["publisher"]["queue_maxsize"],
         )
         publisher_.start()
 
         fileobserver_ = fileobserver.FileObserver(
-            file_path=self._config['fileobserver']['file_path'],
-            backlog=self._config['fileobserver']['backlog']
+            file_path=self._config["fileobserver"]["file_path"],
+            backlog=self._config["fileobserver"]["backlog"],
         )
         fileobserver_.start()
 
@@ -64,9 +64,9 @@ class Service:
             publisher=publisher_,
             fileobserver=fileobserver_,
             profiles_manager=profiles_manager,
-            extra_context=self._config['extra_context'],
-            listen_address=self._config['api']['listen_address'],
-            port=self._config['api']['port']
+            extra_context=self._config["extra_context"],
+            listen_address=self._config["api"]["listen_address"],
+            port=self._config["api"]["port"],
         )
         await api_.start()
 
@@ -74,8 +74,10 @@ class Service:
             await asyncio.sleep(1)
 
     def _shutdown(self, signame):
-        logger.info(f'Caught signal {signame}, '
-                    f'cancelling {len(asyncio.all_tasks())} running tasks')
+        logger.info(
+            f"Caught signal {signame}, "
+            f"cancelling {len(asyncio.all_tasks())} running tasks"
+        )
 
         for task in asyncio.all_tasks():
             task.cancel()
