@@ -236,6 +236,10 @@ class ProfilesManager:
                 and tagged_values['serviceEnabled'][0].lower() == 'false':
             return None
 
+        if 'scope' not in tagged_values or not tagged_values['scope']:
+            logger.warning(f"Malformed scope, skipping resource")
+            return None
+
         scope_ids = atwc.utils.extract_ids(tagged_values['scope'])
         scope_elements = await model_browser.get_elements_batch(scope_ids)
 
