@@ -102,6 +102,7 @@ class ProfilesManager:
                 await resource_browser.fetch()
 
                 for md_resource in resource_browser.md_resources:
+                    logger.info(f"Scanning MD resource: {md_resource['dcterms:title']}")
                     stereo_data = await self._get_ccpub_stereo_data(md_resource)
                     if stereo_data is None:
                         continue
@@ -169,6 +170,10 @@ class ProfilesManager:
         cc_resource = self._find_resource(
             resource_browser.cc_resources, profile.md.name
         )
+        if cc_resource is None:
+            logger.warning(f"MD Resource {md_resource['dcterms:title']} "
+                "doesn't have an associated CC resource")
+
         profile.cc = await self._get_resource_data(
             resource_browser, cc_resource
         )
@@ -210,8 +215,6 @@ class ProfilesManager:
             if self._strip_extension(
                     resource['dcterms:title']) == resource_name:
                 return resource
-
-        logger.warning(f'Cannot find resource name {resource_name}')
 
         return None
 
