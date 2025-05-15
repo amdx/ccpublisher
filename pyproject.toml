@@ -36,7 +36,11 @@ optional = true
 Sphinx = "5.2.3"
 sphinx-rtd-theme = "1.0.0"
 
-[tool.poetry.dev-dependencies]
+
+[tool.poetry.group.dev.dependencies]
+black = "^25.1.0"
+
+[poetry.group.dev.dependencies]
 flake8 = "^5.0.4"
 
 [build-system]
