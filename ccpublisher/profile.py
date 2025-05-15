@@ -218,7 +218,9 @@ class ProfilesManager:
 
         model = await model_browser.get_model_root()
 
-        if not await model_browser.find_stereotype(model, self.CCPUB_STEREOTYPE_NAME):
+        if model is None or not await model_browser.find_stereotype(
+            model, self.CCPUB_STEREOTYPE_NAME
+        ):
             return None
 
         tagged_values = await model_browser.get_tagged_values(
