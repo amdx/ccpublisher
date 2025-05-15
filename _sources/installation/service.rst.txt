@@ -4,7 +4,7 @@ ccpublisher service installation guide
 
 Requirements:
 
-* Teamwork Cloud and Cameo Collaborator services
+* Teamwork Cloud and Cameo Collaborator services (>=2024x R2 HF1)
 * A user/password set for Teamwork Cloud that has R/W access to the targeted resources (MD and CC)
 * Ubuntu Desktop 22.04 LTS (either physical or virtual)
 * (this) ccpublisher package
