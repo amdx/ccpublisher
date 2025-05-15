@@ -27,7 +27,7 @@ aiohttp-jinja2 = "^1.5"
 PyYAML = "^6.0"
 aionotify = "^0.2.0"
 aiofiles = "^0.8.0"
-atwc = "^1.0.0"
+atwc = "^1.1.0"
 
 [tool.poetry.group.docs]
 optional = true
